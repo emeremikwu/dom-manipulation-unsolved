@@ -12,7 +12,7 @@
  */
 
 // Your code goes here...
-
+const allItems = Array.from(document.querySelectorAll(".item"));
 
 
 /**
@@ -23,8 +23,7 @@
  * */
 
 // Your code goes here
-
-
+const main = document.querySelector("#main");
 
 /**
  * @task
@@ -34,8 +33,7 @@
  */
 
 // Your code goes here
-
-
+const favs = document.querySelector("#favs");
 
 /**
  * @task
@@ -48,7 +46,48 @@
 
 // Your code goes here
 
+function updateCollections(id, direction) {
+  const validDirections = {
+    toMain: main,
+    toFavs: favs
+  };
 
+  const targetElement = allItems.find(elem => elem.id == id);
+
+  if (!validDirections[direction]) {
+    console.error("Invalid Direction");
+    return;
+  }
+
+  if (!targetElement) {
+    console.error(`No Element with id ${id} found`);
+    return;
+  }
+
+  const currentParent = targetElement.parentNode;
+  const newParent = validDirections[direction];
+
+  if (currentParent === newParent) {
+    console.error("Element is already in appropriate collection");
+    return;
+  }
+
+  const flipChildIconClass = targetChildElement => {
+    /* const iconClass = targetChildElement.className.trim().split(" ")
+    iconClass[1] = iconClass[1] === "fa-heart-crack" ? "fa-heart-circle-plus" : "fa-heart-crack"
+    targetChildElement.className = iconClass.join(" ") */
+
+    const iconClass = targetChildElement.classList;
+    iconClass.toggle("fa-heart-circle-plus");
+    iconClass.toggle("fa-heart-crack");
+  };
+
+  currentParent.removeChild(targetElement);
+  flipChildIconClass(targetElement.querySelector("i"));
+  newParent.appendChild(targetElement);
+
+  console.info(`Moved item with id ${id} to ${direction === "toMain" ? "main" : "favorites"} collection`);
+}
 
 /**
  * @task
@@ -65,5 +104,14 @@
  */
 
 // Your code goes here...
+
+allItems.forEach(node => {
+  node.addEventListener("click", (e) => {
+    const currentParent = e.target.parentNode;
+    const targetId = e.target.id;
+    const targetDirection = currentParent === main ? "toFavs" : "toMain";
+    updateCollections(targetId, targetDirection)
+  })
+})
 
 
