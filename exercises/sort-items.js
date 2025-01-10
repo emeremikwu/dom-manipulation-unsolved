@@ -12,17 +12,21 @@
  */
 
 // Your code goes here...
-
+const allItems = [...document.querySelectorAll("div.item")]
+// console.log(allItems[0].textContent.trim())
+console.log(allItems)
 
 
 /**
  * @task
- * Select all sort buttons by class of "sortBtn" as a NodeList.
+ * Select all sort buttons by class of "sortBtn" as a NodeList.`
  * Store them in the sortBtn variable
  * Example: const sortBtn = <Your code>;
  */
 
 // Your code goes here...
+const sortBtn = document.querySelectorAll('button.sortBtn')
+console.log(sortBtn)
 
 
 
@@ -38,8 +42,25 @@
  */
 
 // Your code goes here...
+function sortData(direction){
 
+  const directions = {
+    asc: (a, b) => a.id.localeCompare(b.id),
+    desc: (a, b) => b.id.localeCompare(a.id)
+  }
 
+  if (!(direction in directions)) {
+    console.error(`Invalid direction: ${direction}`);
+  }
+
+  const mainContainer = document.querySelector("#main");
+
+  allItems.sort(directions[direction]);
+  mainContainer.replaceChildren(...allItems);
+
+  //for debugging
+  return allItems;
+}
 
 /**
  * @task
@@ -50,5 +71,9 @@
  */
 
 // Your code goes here...
-
+sortBtn.forEach(btn => {
+  btn.addEventListener("click", e => {
+    sortData(e.target.dataset.sortdir)
+  })
+})
 
