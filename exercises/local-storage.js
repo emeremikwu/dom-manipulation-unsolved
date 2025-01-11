@@ -38,3 +38,52 @@
  */
 
 // Your code goes here...
+
+const container = document.querySelector(".cardsContainer")
+// array of booleans represering each square
+const favsArray = Array.from({ length: container.children.length }, x => false)
+
+// index: 0 to length of container children
+function toggleBox(index, toggleFavorite = true) {
+  container.children[index].style.backgroundColor = toggleFavorite && favsArray[index] ? "white" : "red";
+  if (toggleFavorite)
+    favsArray[index] = !favsArray[index]
+}
+
+function updateStorage() {
+  // pack favsArray into a single byte, first boolean being most significant bit
+  let packed = 0
+  favsArray.forEach((bool, index) => {
+    // if true, shfit bit and 
+    // e.g [f, f, t] = 4
+    if (bool)
+      packed |= (1 << index)
+  })
+  const hex = packed.toString(16)
+  localStorage.setItem("favorites", hex)
+  
+  console.info(`LS Updated: [${favsArray}] => ${hex}`)
+}
+
+// cache initialization
+if (localStorage["favorites"]) {
+  let unpack = parseInt(localStorage["favorites"], 16)
+  favsArray.forEach((bool, index) => {
+    favsArray[index] = !!(unpack & (1 << index))
+  })
+
+  favsArray.forEach((bool, index) => { if (bool) toggleBox(index, false) })
+}
+
+container.addEventListener("click", ({ target }) => {
+  if (!target.id && !target.classList.contains("card")) {
+    return
+  }
+
+  const index = target.id - 1;
+
+  toggleBox(index)
+  updateStorage()
+  console.info(`${target.id}: ${favsArray[index] ? "Activated" : "Deactivated"}`)
+
+})

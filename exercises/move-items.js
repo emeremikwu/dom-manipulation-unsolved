@@ -107,8 +107,9 @@ function updateCollections(id, direction) {
 
 allItems.forEach(node => {
   node.addEventListener("click", (e) => {
-    const currentParent = e.target.parentNode;
-    const targetId = e.target.id;
+    // use node instead of e.target because if child is pressed, it will try to get the ID of the child instead of the node
+    const currentParent = node.parentNode;
+    const targetId = node.id;
     const targetDirection = currentParent === main ? "toFavs" : "toMain";
     updateCollections(targetId, targetDirection)
   })
