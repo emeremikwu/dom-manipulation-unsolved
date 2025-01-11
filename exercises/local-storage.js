@@ -42,6 +42,7 @@
 const container = document.querySelector(".cardsContainer")
 // array of booleans represering each square
 const favsArray = Array.from({ length: container.children.length }, x => false)
+const favsID_b = 'favorites-hex'
 
 // index: 0 to length of container children
 function toggleBox(index, toggleFavorite = true) {
@@ -51,28 +52,30 @@ function toggleBox(index, toggleFavorite = true) {
 }
 
 function updateStorage() {
-  // pack favsArray into a single byte, first boolean being most significant bit
+  // pack favsArray into a single byte, first boolean being least significant bit
   let packed = 0
   favsArray.forEach((bool, index) => {
-    // if true, shfit bit and 
+    // if true shift the bit from the index and apply a mask
     // e.g [f, f, t] = 4
     if (bool)
       packed |= (1 << index)
   })
   const hex = packed.toString(16)
-  localStorage.setItem("favorites", hex)
-  
+  localStorage.setItem(favsID_b, hex)
+
   console.info(`LS Updated: [${favsArray}] => ${hex}`)
 }
 
-// cache initialization
-if (localStorage["favorites"]) {
-  let unpack = parseInt(localStorage["favorites"], 16)
-  favsArray.forEach((bool, index) => {
-    favsArray[index] = !!(unpack & (1 << index))
-  })
+function initializeFromStorage() {
+  // cache initialization
+  if (localStorage[favsID_b]) {
+    let unpack = parseInt(localStorage[favsID_b], 16)
+    favsArray.forEach((bool, index) => {
+      favsArray[index] = !!(unpack & (1 << index))
+    })
 
-  favsArray.forEach((bool, index) => { if (bool) toggleBox(index, false) })
+    favsArray.forEach((bool, index) => { if (bool) toggleBox(index, false) })
+  }
 }
 
 container.addEventListener("click", ({ target }) => {
@@ -80,10 +83,13 @@ container.addEventListener("click", ({ target }) => {
     return
   }
 
-  const index = target.id - 1;
+  // const index = target.id - 1;
+  const index = Array.from(container.children).indexOf(target) //safer but recreates a list on evern click
 
   toggleBox(index)
-  updateStorage()
   console.info(`${target.id}: ${favsArray[index] ? "Activated" : "Deactivated"}`)
+  updateStorage()
 
 })
+
+initializeFromStorage()
